@@ -99,7 +99,7 @@ public class ImageController {
         Image image = imageService.getImage(imageId);
         model.addAttribute("image", image);
         //Check if logged user is the actual owner of image
-        if (imageService.isUserTheOwnerOfImage(image, user.getId())) {
+        if (isUserTheOwnerOfImage(image, user.getId())) {
             String tags = convertTagsToString(image.getTags());
             model.addAttribute("tags", tags);
             return "images/edit";
@@ -154,7 +154,7 @@ public class ImageController {
         User user = (User) session.getAttribute("loggeduser");
         Image image = imageService.getImage(imageId);
         //Check if logged user is the actual owner of image
-        if (imageService.isUserTheOwnerOfImage(image, user.getId())) {
+        if (isUserTheOwnerOfImage(image, user.getId())) {
             imageService.deleteImage(imageId);
             return "redirect:/images";
         }
@@ -207,5 +207,16 @@ public class ImageController {
         tagString.append(lastTag.getName());
 
         return tagString.toString();
+    }
+
+    /**
+     * This method verifies whether the user Id passed refers to the user who uploaded the image (owner of image)
+     *
+     * @param image        The image to which the owner has to be verified in case of edit/delete
+     * @param loggedUserId The User id of the logged in user
+     * @return true if the logged user is the one who uploaded the image, else false
+     */
+    public boolean isUserTheOwnerOfImage(Image image, Integer loggedUserId) {
+        return (image != null && image.getUser() != null && image.getUser().getId() == loggedUserId);
     }
 }
